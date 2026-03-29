@@ -1,0 +1,37 @@
+<idea-plugin>
+    <id>dev.dalex.textpolisher</id>
+    <name>AI Text Polisher</name>
+    <vendor url="https://dalex.dev">dalex</vendor>
+    <description><![CDATA[
+        AI-powered text polishing tool. Select text, right-click, and enhance with Anthropic, OpenAI, or Ollama.
+        <ul>
+            <li>Multiple AI providers: Anthropic, OpenAI, Ollama</li>
+            <li>Enhancement modes: correct-only, rephrase, formal, concise</li>
+            <li>Built-in diff view for reviewing changes</li>
+            <li>Secure API key storage via OS credential manager</li>
+        </ul>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <actions>
+        <action id="DalexTextPolisher.Enhance"
+                class="dev.dalex.textpolisher.action.EnhanceTextAction"
+                text="AI Text Polisher: Enhance"
+                description="Polish the selected text using AI">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <notificationGroup id="AI Text Polisher"
+                           displayType="BALLOON"/>
+        <applicationService
+                serviceImplementation="dev.dalex.textpolisher.settings.PolisherSettings"/>
+        <applicationConfigurable
+                parentId="tools"
+                instance="dev.dalex.textpolisher.settings.PolisherConfigurable"
+                id="dev.dalex.textpolisher.settings"
+                displayName="AI Text Polisher"/>
+    </extensions>
+</idea-plugin>
