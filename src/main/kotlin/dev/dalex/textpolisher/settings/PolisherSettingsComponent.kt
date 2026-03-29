@@ -1,5 +1,6 @@
 package dev.dalex.textpolisher.settings
 
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBPasswordField
@@ -32,14 +33,16 @@ class PolisherSettingsComponent {
             override fun textChanged(e: DocumentEvent) { _apiKeyModified = true }
         })
 
-        // When provider changes, load the stored key for that provider
+        // When provider changes, load the stored key for that provider off the EDT
         providerCombo.addActionListener {
             val selectedProvider = providerCombo.selectedItem as? String ?: return@addActionListener
-            val storedKey = ApiKeyStorage.get(selectedProvider) ?: ""
-            // Suppress _apiKeyModified — loading a stored key is not a user edit
-            _apiKeyModified = false
-            apiKeyField.text = storedKey
-            _apiKeyModified = false
+            ApplicationManager.getApplication().executeOnPooledThread {
+                val storedKey = ApiKeyStorage.get(selectedProvider) ?: ""
+                ApplicationManager.getApplication().invokeLater {
+                    apiKeyField.text = storedKey
+                    _apiKeyModified = false
+                }
+            }
         }
 
         val state = PolisherSettings.getInstance().state

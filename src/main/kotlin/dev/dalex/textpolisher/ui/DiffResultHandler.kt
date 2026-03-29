@@ -8,19 +8,18 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.Messages
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextArea
-import java.awt.BorderLayout
 import java.awt.Dimension
-import javax.swing.JButton
-import javax.swing.JDialog
+import java.awt.event.ActionEvent
+import javax.swing.AbstractAction
+import javax.swing.Action
+import javax.swing.JComponent
 import javax.swing.JLabel
-import javax.swing.JPanel
 
 object DiffResultHandler {
-
-    private enum class Action { APPLY, VIEW_DIFF, CANCEL }
 
     fun show(
         project: Project,
@@ -40,7 +39,7 @@ object DiffResultHandler {
 
             when (resultDisplay) {
                 "diff" -> showDiff(project, editor, selectionStart, selectionEnd, originalText, polishedText)
-                else -> showInline(project, editor, selectionStart, selectionEnd, originalText, polishedText)
+                else   -> showInline(project, editor, selectionStart, selectionEnd, originalText, polishedText)
             }
         }
     }
@@ -53,47 +52,42 @@ object DiffResultHandler {
         originalText: String,
         polishedText: String,
     ) {
-        val dialog = JDialog()
-        dialog.title = "AI Text Polisher"
-        dialog.isModal = true
-        dialog.layout = BorderLayout(8, 8)
+        // VIEW_DIFF exit code — DialogWrapper.NEXT_USER_EXIT_CODE is reserved for custom codes
+        val VIEW_DIFF_CODE = DialogWrapper.NEXT_USER_EXIT_CODE
 
-        var action = Action.CANCEL
+        val dialog = object : DialogWrapper(project) {
+            init {
+                title = "AI Text Polisher"
+                setOKButtonText("Apply")
+                init()
+            }
 
-        val textArea = JBTextArea(polishedText).apply {
-            lineWrap = true
-            wrapStyleWord = true
-            isEditable = false
-            rows = 6
+            override fun createNorthPanel(): JComponent = JLabel("Polished result:")
+
+            override fun createCenterPanel(): JComponent {
+                val textArea = JBTextArea(polishedText).apply {
+                    lineWrap = true
+                    wrapStyleWord = true
+                    isEditable = false
+                    rows = 6
+                }
+                return JBScrollPane(textArea).apply { preferredSize = Dimension(520, 140) }
+            }
+
+            override fun createActions(): Array<Action> = arrayOf(
+                okAction,
+                object : AbstractAction("View Diff") {
+                    override fun actionPerformed(e: ActionEvent) = close(VIEW_DIFF_CODE)
+                },
+                cancelAction,
+            )
         }
 
-        val buttonPanel = JPanel().apply {
-            val applyBtn = JButton("Apply").apply {
-                addActionListener { action = Action.APPLY; dialog.dispose() }
-            }
-            val diffBtn = JButton("View Diff").apply {
-                addActionListener { action = Action.VIEW_DIFF; dialog.dispose() }
-            }
-            val cancelBtn = JButton("Cancel").apply {
-                addActionListener { dialog.dispose() }
-            }
-            add(applyBtn)
-            add(diffBtn)
-            add(cancelBtn)
-            dialog.rootPane.defaultButton = applyBtn
-        }
+        dialog.show()
 
-        dialog.add(JLabel("  Polished result:"), BorderLayout.NORTH)
-        dialog.add(JBScrollPane(textArea).apply { preferredSize = Dimension(520, 140) }, BorderLayout.CENTER)
-        dialog.add(buttonPanel, BorderLayout.SOUTH)
-        dialog.pack()
-        dialog.setLocationRelativeTo(null)
-        dialog.isVisible = true
-
-        when (action) {
-            Action.APPLY -> replaceText(project, editor, selectionStart, selectionEnd, polishedText)
-            Action.VIEW_DIFF -> showDiff(project, editor, selectionStart, selectionEnd, originalText, polishedText)
-            Action.CANCEL -> Unit
+        when (dialog.exitCode) {
+            DialogWrapper.OK_EXIT_CODE -> replaceText(project, editor, selectionStart, selectionEnd, polishedText)
+            VIEW_DIFF_CODE             -> showDiff(project, editor, selectionStart, selectionEnd, originalText, polishedText)
         }
     }
 
@@ -114,7 +108,7 @@ object DiffResultHandler {
             "Polished"
         )
 
-        // Modal: diff window must be closed before the Apply dialog appears
+        // Modal: diff window is closed before the Apply dialog appears
         DiffManager.getInstance().showDiff(project, request, DiffDialogHints.MODAL)
 
         val result = Messages.showYesNoDialog(
