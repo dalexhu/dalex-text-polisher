@@ -8,16 +8,19 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.ui.popup.JBPopupFactory
+import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextArea
+import java.awt.BorderLayout
 import java.awt.Dimension
-import java.awt.event.ActionEvent
-import javax.swing.AbstractAction
-import javax.swing.Action
-import javax.swing.JComponent
-import javax.swing.JLabel
+import java.awt.FlowLayout
+import java.awt.Point
+import javax.swing.JButton
+import javax.swing.JPanel
+import javax.swing.JPopupMenu
+import javax.swing.JMenuItem
 
 object DiffResultHandler {
 
@@ -52,43 +55,58 @@ object DiffResultHandler {
         originalText: String,
         polishedText: String,
     ) {
-        // VIEW_DIFF exit code — DialogWrapper.NEXT_USER_EXIT_CODE is reserved for custom codes
-        val VIEW_DIFF_CODE = DialogWrapper.NEXT_USER_EXIT_CODE
+        val textArea = JBTextArea(polishedText).apply {
+            lineWrap = true
+            wrapStyleWord = true
+            isEditable = false
+            rows = 5
+        }
 
-        val dialog = object : DialogWrapper(project) {
-            init {
-                title = "AI Text Polisher"
-                setOKButtonText("Apply")
-                init()
-            }
+        // Bottom bar: [Apply]  [⋮]
+        val bottomBar = JPanel(FlowLayout(FlowLayout.RIGHT, 4, 4))
+        val applyBtn = JButton("Apply")
+        val moreBtn = JButton("⋯")
 
-            override fun createNorthPanel(): JComponent = JLabel("Polished result:")
+        bottomBar.add(applyBtn)
+        bottomBar.add(moreBtn)
 
-            override fun createCenterPanel(): JComponent {
-                val textArea = JBTextArea(polishedText).apply {
-                    lineWrap = true
-                    wrapStyleWord = true
-                    isEditable = false
-                    rows = 6
+        val panel = JPanel(BorderLayout(0, 4)).apply {
+            add(JBScrollPane(textArea).apply { preferredSize = Dimension(420, 110) }, BorderLayout.CENTER)
+            add(bottomBar, BorderLayout.SOUTH)
+        }
+
+        val popup = JBPopupFactory.getInstance()
+            .createComponentPopupBuilder(panel, applyBtn)
+            .setTitle("AI Text Polisher")
+            .setResizable(true)
+            .setMovable(true)
+            .setRequestFocus(true)
+            .createPopup()
+
+        applyBtn.addActionListener {
+            popup.cancel()
+            replaceText(project, editor, selectionStart, selectionEnd, polishedText)
+        }
+
+        moreBtn.addActionListener {
+            val menu = JPopupMenu()
+            menu.add(JMenuItem("View Diff").apply {
+                addActionListener {
+                    popup.cancel()
+                    showDiff(project, editor, selectionStart, selectionEnd, originalText, polishedText)
                 }
-                return JBScrollPane(textArea).apply { preferredSize = Dimension(520, 140) }
-            }
-
-            override fun createActions(): Array<Action> = arrayOf(
-                okAction,
-                object : AbstractAction("View Diff") {
-                    override fun actionPerformed(e: ActionEvent) = close(VIEW_DIFF_CODE)
-                },
-                cancelAction,
-            )
+            })
+            menu.add(JMenuItem("Dismiss").apply {
+                addActionListener { popup.cancel() }
+            })
+            menu.show(moreBtn, 0, moreBtn.height)
         }
 
-        dialog.show()
-
-        when (dialog.exitCode) {
-            DialogWrapper.OK_EXIT_CODE -> replaceText(project, editor, selectionStart, selectionEnd, polishedText)
-            VIEW_DIFF_CODE             -> showDiff(project, editor, selectionStart, selectionEnd, originalText, polishedText)
-        }
+        // Show the popup just below the selection end
+        val selectionEndPoint = editor.offsetToXY(selectionEnd)
+        val lineHeight = editor.lineHeight
+        val showPoint = Point(selectionEndPoint.x, selectionEndPoint.y + lineHeight)
+        popup.show(RelativePoint(editor.contentComponent, showPoint))
     }
 
     private fun showDiff(
