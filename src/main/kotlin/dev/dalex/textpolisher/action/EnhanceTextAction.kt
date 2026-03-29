@@ -50,7 +50,8 @@ class EnhanceTextAction : AnAction() {
                 indicator.isIndeterminate = true
                 try {
                     val prompt = PromptBuilder.build(selectedText, state)
-                    val result = AiClient.create(state, apiKey).complete(prompt, state.requestTimeout.toLong())
+                    val raw = AiClient.create(state, apiKey).complete(prompt, state.requestTimeout.toLong())
+                    val result = if (selectedText.endsWith("\n") && !raw.endsWith("\n")) "$raw\n" else raw
                     DiffResultHandler.show(project, editor, selectionStart, selectionEnd, selectedText, result, state.autoApply, state.resultDisplay)
                 } catch (ex: Exception) {
                     notify(project, "Enhancement failed: ${ex.message}", NotificationType.ERROR)

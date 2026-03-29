@@ -3,14 +3,136 @@
     <name>AI Text Polisher</name>
     <vendor url="https://dalex.dev">dalex</vendor>
     <description><![CDATA[
-        AI-powered text polishing tool. Select text, right-click, and enhance with Anthropic, OpenAI, or Ollama.
+        <p>
+            <b>AI Text Polisher</b> is a lightweight, distraction-free writing assistant built into
+            your IDE. Select any text, press <b>⌘⇧D</b> (macOS) or <b>⊞⇧D</b> (Windows), and get
+            AI-refined text back in seconds — without switching apps, copying to a chat window, or
+            breaking your flow.
+        </p>
+        <p>
+            Works everywhere you write: commit messages, docstrings, README files, inline comments,
+            changelogs, API descriptions, or any other text in any file type.
+        </p>
+
+        <h3>✦ 7 AI Providers, One Plugin</h3>
+        <p>
+            Connect to the model you already use. Each provider is pre-configured with a working
+            default endpoint and model — add your API key and you're ready.
+        </p>
         <ul>
-            <li>Multiple AI providers: Anthropic, OpenAI, Ollama</li>
-            <li>Enhancement modes: correct-only, rephrase, formal, concise</li>
-            <li>Built-in diff view for reviewing changes</li>
-            <li>Secure API key storage via OS credential manager</li>
+            <li><b>Anthropic</b> — Claude Haiku, Sonnet, and Opus; best-in-class writing quality</li>
+            <li><b>OpenAI</b> — GPT-4o and GPT-4o mini; the most widely used AI API</li>
+            <li><b>DeepSeek</b> — deepseek-chat and deepseek-reasoner; excellent value</li>
+            <li><b>Groq</b> — Llama 3.3, Mixtral; blazing fast inference, ideal for quick edits</li>
+            <li><b>Mistral</b> — mistral-large, mistral-small; strong European alternative</li>
+            <li><b>Gemini</b> — Gemini 2.0 Flash and Pro; Google's latest multimodal models</li>
+            <li><b>Ollama</b> — any local model (Llama, Mistral, Phi, …); fully offline, zero cost</li>
         </ul>
+        <p>
+            All OpenAI-compatible endpoints are supported. Use the Endpoint field to point at a
+            private proxy, a corporate gateway, or any self-hosted inference server.
+        </p>
+
+        <h3>✦ Four Enhancement Modes</h3>
+        <p>Choose the mode that matches your goal:</p>
+        <ul>
+            <li>
+                <b>Correct Only</b> — silently fixes spelling and grammar. Your voice, your structure,
+                your word choices — completely untouched. Great for proofreading without AI rewriting.
+            </li>
+            <li>
+                <b>Rephrase</b> — rewrites for natural, fluent expression while preserving your
+                original meaning. Removes awkward phrasing, redundant words, and unnatural rhythm.
+            </li>
+            <li>
+                <b>Formal</b> — elevates casual or draft language to professional, publication-ready
+                tone. Ideal for documentation, release notes, and external-facing content.
+            </li>
+            <li>
+                <b>Concise</b> — strips filler words and compresses verbose sentences. Say exactly
+                what you mean in half the space.
+            </li>
+        </ul>
+
+        <h3>✦ Multilingual Output</h3>
+        <p>
+            Write in one language, polish in another — or keep the same language but target a
+            specific regional standard. Ten target languages supported: English, Chinese (Simplified),
+            French, German, Spanish, Japanese, Korean, Portuguese, Russian, and Italian.
+        </p>
+        <p>
+            Pair any mode with a custom instruction for fine-grained control:
+            <i>"Use British English"</i>, <i>"Keep all technical terms as-is"</i>,
+            <i>"Write for a non-technical audience"</i> — the AI follows your lead.
+        </p>
+
+        <h3>✦ Review Before You Apply</h3>
+        <p>You control what gets changed. Three result modes to match your workflow:</p>
+        <ul>
+            <li>
+                <b>Inline popup</b> (default) — a compact overlay anchored just below your selection
+                shows the polished text immediately. Hit <b>Apply</b> to replace, <b>View Diff</b>
+                for a side-by-side comparison, or <b>Dismiss</b> to discard — all without moving
+                your cursor.
+            </li>
+            <li>
+                <b>Diff view</b> — opens a full IDE diff panel with the original on the left and
+                the polished text on the right. <b>Apply</b> and <b>Dismiss</b> are built directly
+                into the dialog — no extra confirmation step.
+            </li>
+            <li>
+                <b>Auto-apply</b> — replaces the selected text immediately, no preview. Best for
+                high-confidence tasks like grammar correction when you trust the model.
+            </li>
+        </ul>
+
+        <h3>✦ Per-Provider Configuration</h3>
+        <p>
+            Each provider remembers its own endpoint, model, and API key independently.
+            Switching from Claude to GPT-4o to a local Ollama model is a single dropdown click —
+            no re-entering credentials, no reconfiguring endpoints.
+        </p>
+
+        <h3>✦ Secure by Default</h3>
+        <p>
+            API keys are stored exclusively in the OS credential manager:
+            <b>Keychain</b> on macOS, <b>Credential Manager</b> on Windows.
+            They are never written to <code>AITextPolisher.xml</code> or any project file,
+            and never appear in version control. The plugin reads keys on a background thread
+            to avoid UI freezes on credential store access.
+        </p>
+
+        <h3>Getting Started</h3>
+        <ol>
+            <li>Open <b>Settings → Tools → AI Text Polisher</b></li>
+            <li>Select a provider, paste your API key — the model field auto-fills with a recommended default</li>
+            <li>Select any text in the editor</li>
+            <li>Press <b>⌘⇧D</b> (macOS) / <b>⊞⇧D</b> (Windows), or right-click → <b>AI Text Polisher: Enhance</b></li>
+            <li>Review the result in the popup and choose Apply, View Diff, or Dismiss</li>
+        </ol>
+
+        <h3>Keyboard Shortcut</h3>
+        <p>
+            Default: <b>⌘⇧D</b> on macOS · <b>⊞⇧D</b> on Windows.<br/>
+            To reassign, go to <b>Settings → Keymap</b>, search <i>AI Text Polisher</i>,
+            and set any shortcut you prefer.
+        </p>
     ]]></description>
+
+    <change-notes><![CDATA[
+        <h3>0.1.3</h3>
+        <ul>
+            <li>Added DeepSeek, Groq, Mistral, and Gemini provider support (7 providers total)</li>
+            <li>Per-provider endpoint, model, and API key — each provider is fully independent</li>
+            <li>Switching providers now auto-fills endpoint and model with saved values or defaults</li>
+            <li>Inline result popup with Apply / View Diff / Dismiss shown below the selection</li>
+            <li>Diff view embeds Apply and Dismiss directly — no extra confirmation dialog</li>
+            <li>Keyboard shortcut: ⌘⇧D (macOS) / ⊞⇧D (Windows), customizable via Keymap</li>
+            <li>Fixed: trailing newline preserved after text replacement</li>
+            <li>Fixed: OkHttp connection pool now shared across requests for faster responses</li>
+            <li>Fixed: request timeout setting now correctly applied to all providers</li>
+        </ul>
+    ]]></change-notes>
 
     <depends>com.intellij.modules.platform</depends>
 
@@ -20,6 +142,7 @@
                 text="AI Text Polisher: Enhance"
                 description="Polish the selected text using AI">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="meta shift D"/>
         </action>
     </actions>
 

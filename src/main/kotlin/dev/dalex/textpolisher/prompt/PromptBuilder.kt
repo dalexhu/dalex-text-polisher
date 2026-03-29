@@ -23,6 +23,7 @@ object PromptBuilder {
         parts.add(MODE_INSTRUCTIONS[state.mode] ?: MODE_INSTRUCTIONS["correct-only"]!!)
         parts.add("Output in ${state.targetLanguage}.")
         parts.add("Return ONLY the polished text. No explanations, no preamble, no markdown formatting.")
+        parts.add("Preserve any comment markers or line prefixes exactly as they appear (e.g. //, /*, *, #, --, <!--, etc.).")
 
         if (state.customPrompt.isNotBlank()) {
             parts.add(state.customPrompt)

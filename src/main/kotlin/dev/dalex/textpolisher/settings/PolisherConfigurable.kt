@@ -18,8 +18,8 @@ class PolisherConfigurable : Configurable {
         val c = component ?: return false
         val state = PolisherSettings.getInstance().state
         return c.provider != state.provider
-                || c.apiEndpoint != state.apiEndpoint
-                || c.model != state.model
+                || c.apiEndpoint != (state.providerEndpoints[c.provider] ?: "")
+                || c.model != (state.providerModels[c.provider] ?: PolisherSettings.DEFAULT_MODELS[c.provider] ?: "")
                 || c.targetLanguage != state.targetLanguage
                 || c.mode != state.mode
                 || c.customPrompt != state.customPrompt
@@ -34,8 +34,8 @@ class PolisherConfigurable : Configurable {
         val c = component ?: return
         val settings = PolisherSettings.getInstance()
         settings.state.provider = c.provider
-        settings.state.apiEndpoint = c.apiEndpoint
-        settings.state.model = c.model
+        settings.state.providerEndpoints[c.provider] = c.apiEndpoint
+        settings.state.providerModels[c.provider] = c.model
         settings.state.targetLanguage = c.targetLanguage
         settings.state.mode = c.mode
         settings.state.customPrompt = c.customPrompt
@@ -54,8 +54,8 @@ class PolisherConfigurable : Configurable {
         val c = component ?: return
         val state = PolisherSettings.getInstance().state
         c.provider = state.provider
-        c.apiEndpoint = state.apiEndpoint
-        c.model = state.model
+        c.apiEndpoint = state.providerEndpoints[state.provider] ?: ""
+        c.model = state.providerModels[state.provider] ?: PolisherSettings.DEFAULT_MODELS[state.provider] ?: ""
         c.targetLanguage = state.targetLanguage
         c.mode = state.mode
         c.customPrompt = state.customPrompt

@@ -1,15 +1,15 @@
 package dev.dalex.textpolisher.ui
 
 import com.intellij.diff.DiffContentFactory
-import com.intellij.diff.DiffDialogHints
 import com.intellij.diff.DiffManager
 import com.intellij.diff.requests.SimpleDiffRequest
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.popup.JBPopupFactory
+import java.awt.Toolkit
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.ui.components.JBScrollPane
 import com.intellij.ui.components.JBTextArea
@@ -18,9 +18,8 @@ import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.Point
 import javax.swing.JButton
+import javax.swing.JComponent
 import javax.swing.JPanel
-import javax.swing.JPopupMenu
-import javax.swing.JMenuItem
 
 object DiffResultHandler {
 
@@ -62,16 +61,18 @@ object DiffResultHandler {
             rows = 5
         }
 
-        // Bottom bar: [Apply]  [⋮]
         val bottomBar = JPanel(FlowLayout(FlowLayout.RIGHT, 4, 4))
         val applyBtn = JButton("Apply")
-        val moreBtn = JButton("⋯")
+        val diffBtn = JButton("View Diff")
+        val dismissBtn = JButton("Dismiss")
 
+        bottomBar.add(dismissBtn)
+        bottomBar.add(diffBtn)
         bottomBar.add(applyBtn)
-        bottomBar.add(moreBtn)
 
+        val popupWidth = (Toolkit.getDefaultToolkit().screenSize.width * 0.35).toInt()
         val panel = JPanel(BorderLayout(0, 4)).apply {
-            add(JBScrollPane(textArea).apply { preferredSize = Dimension(420, 110) }, BorderLayout.CENTER)
+            add(JBScrollPane(textArea).apply { preferredSize = Dimension(popupWidth, 120) }, BorderLayout.CENTER)
             add(bottomBar, BorderLayout.SOUTH)
         }
 
@@ -87,20 +88,11 @@ object DiffResultHandler {
             popup.cancel()
             replaceText(project, editor, selectionStart, selectionEnd, polishedText)
         }
-
-        moreBtn.addActionListener {
-            val menu = JPopupMenu()
-            menu.add(JMenuItem("View Diff").apply {
-                addActionListener {
-                    popup.cancel()
-                    showDiff(project, editor, selectionStart, selectionEnd, originalText, polishedText)
-                }
-            })
-            menu.add(JMenuItem("Dismiss").apply {
-                addActionListener { popup.cancel() }
-            })
-            menu.show(moreBtn, 0, moreBtn.height)
+        diffBtn.addActionListener {
+            popup.cancel()
+            showDiff(project, editor, selectionStart, selectionEnd, originalText, polishedText)
         }
+        dismissBtn.addActionListener { popup.cancel() }
 
         // Show the popup just below the selection end
         val selectionEndPoint = editor.offsetToXY(selectionEnd)
@@ -126,18 +118,28 @@ object DiffResultHandler {
             "Polished"
         )
 
-        // Modal: diff window is closed before the Apply dialog appears
-        DiffManager.getInstance().showDiff(project, request, DiffDialogHints.MODAL)
+        val dialog = object : DialogWrapper(project) {
+            init {
+                title = "AI Text Polisher"
+                setOKButtonText("Apply")
+                setCancelButtonText("Dismiss")
+                init()
+            }
 
-        val result = Messages.showYesNoDialog(
-            project,
-            "Apply the polished text?",
-            "AI Text Polisher",
-            "Apply",
-            "Dismiss",
-            Messages.getQuestionIcon()
-        )
-        if (result == Messages.YES) {
+            override fun createCenterPanel(): JComponent {
+                val panel = DiffManager.getInstance().createRequestPanel(project, disposable, null)
+                panel.setRequest(request)
+                return panel.component
+            }
+
+            override fun getInitialSize(): java.awt.Dimension {
+                val screen = Toolkit.getDefaultToolkit().screenSize
+                val w = (screen.width * 0.35).toInt()
+                return java.awt.Dimension(w, (w * 0.75).toInt())
+            }
+        }
+
+        if (dialog.showAndGet()) {
             replaceText(project, editor, selectionStart, selectionEnd, polishedText)
         }
     }

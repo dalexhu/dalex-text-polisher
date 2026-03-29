@@ -28,16 +28,34 @@ class PolisherSettingsComponent {
     val apiKeyModified: Boolean get() = _apiKeyModified
     fun resetApiKeyModified() { _apiKeyModified = false }
 
+    // Tracks the provider that was active before the combo changes
+    private var currentProvider: String = PolisherSettings.getInstance().state.provider
+
     init {
         apiKeyField.document.addDocumentListener(object : DocumentAdapter() {
             override fun textChanged(e: DocumentEvent) { _apiKeyModified = true }
         })
 
-        // When provider changes, load the stored key for that provider off the EDT
+        // When provider changes: save old values, load new provider's values
         providerCombo.addActionListener {
-            val selectedProvider = providerCombo.selectedItem as? String ?: return@addActionListener
+            val newProvider = providerCombo.selectedItem as? String ?: return@addActionListener
+            if (newProvider == currentProvider) return@addActionListener
+
+            // Persist current endpoint/model into the per-provider maps
+            val state = PolisherSettings.getInstance().state
+            state.providerEndpoints[currentProvider] = apiEndpointField.text
+            state.providerModels[currentProvider] = modelField.text
+
+            // Load new provider's saved values, or fall back to defaults
+            apiEndpointField.text = state.providerEndpoints[newProvider] ?: ""
+            modelField.text = state.providerModels[newProvider]
+                ?: PolisherSettings.DEFAULT_MODELS[newProvider] ?: ""
+
+            currentProvider = newProvider
+
+            // Load API key off EDT
             ApplicationManager.getApplication().executeOnPooledThread {
-                val storedKey = ApiKeyStorage.get(selectedProvider) ?: ""
+                val storedKey = ApiKeyStorage.get(newProvider) ?: ""
                 ApplicationManager.getApplication().invokeLater {
                     apiKeyField.text = storedKey
                     _apiKeyModified = false
@@ -49,8 +67,9 @@ class PolisherSettingsComponent {
         providerCombo.selectedItem = state.provider
         apiKeyField.text = ApiKeyStorage.get(state.provider) ?: ""
         _apiKeyModified = false
-        apiEndpointField.text = state.apiEndpoint
-        modelField.text = state.model
+        apiEndpointField.text = state.providerEndpoints[state.provider] ?: ""
+        modelField.text = state.providerModels[state.provider]
+            ?: PolisherSettings.DEFAULT_MODELS[state.provider] ?: ""
         languageCombo.selectedItem = state.targetLanguage
         modeCombo.selectedItem = state.mode
         customPromptField.text = state.customPrompt

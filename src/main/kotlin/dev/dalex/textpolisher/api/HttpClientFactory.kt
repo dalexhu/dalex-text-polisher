@@ -5,8 +5,12 @@ import com.google.gson.JsonObject
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
-internal fun buildHttpClient(timeoutMs: Long): OkHttpClient =
-    OkHttpClient.Builder()
+// Shared client: reuses connection pool and thread pool across all requests.
+// Per-call timeouts are applied via newBuilder() without allocating new pools.
+internal val sharedHttpClient: OkHttpClient = OkHttpClient()
+
+internal fun sharedHttpClient(timeoutMs: Long): OkHttpClient =
+    sharedHttpClient.newBuilder()
         .connectTimeout(timeoutMs, TimeUnit.MILLISECONDS)
         .readTimeout(timeoutMs, TimeUnit.MILLISECONDS)
         .writeTimeout(timeoutMs, TimeUnit.MILLISECONDS)

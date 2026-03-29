@@ -15,8 +15,10 @@ class PolisherSettings : PersistentStateComponent<PolisherSettings.State> {
     data class State(
         // Connection
         var provider: String = "anthropic",
-        var apiEndpoint: String = "",
-        var model: String = "claude-haiku-4-5",
+
+        // Per-provider endpoint/model overrides (empty string = use default endpoint)
+        var providerEndpoints: MutableMap<String, String> = mutableMapOf(),
+        var providerModels: MutableMap<String, String> = mutableMapOf(),
 
         // Enhancement
         var targetLanguage: String = "English",
@@ -41,6 +43,16 @@ class PolisherSettings : PersistentStateComponent<PolisherSettings.State> {
             ApplicationManager.getApplication().getService(PolisherSettings::class.java)
 
         val PROVIDERS = listOf("anthropic", "openai", "deepseek", "groq", "mistral", "gemini", "ollama")
+
+        val DEFAULT_MODELS = mapOf(
+            "anthropic" to "claude-haiku-4-5-20251001",
+            "openai"    to "gpt-4o-mini",
+            "deepseek"  to "deepseek-chat",
+            "groq"      to "llama-3.3-70b-versatile",
+            "mistral"   to "mistral-large-latest",
+            "gemini"    to "gemini-2.0-flash",
+            "ollama"    to "llama3.2",
+        )
         val MODES = listOf("correct-only", "rephrase", "formal", "concise")
         val RESULT_DISPLAYS = listOf("inline", "diff")
         val LANGUAGES = listOf(

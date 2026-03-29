@@ -4,7 +4,7 @@ import dev.dalex.textpolisher.prompt.PromptBuilder
 import dev.dalex.textpolisher.settings.PolisherSettings
 
 /**
- * Interface for AI clients that can generate text completions. please 确认功能设计是否合理
+ * Interface for AI clients that can generate text completions. Please confirm whether the functional design is reasonable.
  */
 interface AiClient {
     fun complete(prompt: PromptBuilder.Prompt, timeoutMs: Long): String
@@ -21,8 +21,10 @@ interface AiClient {
 
         fun create(state: PolisherSettings.State, apiKey: String?): AiClient {
             val key = apiKey ?: ""
-            val endpoint = state.apiEndpoint.trim()
-            val model = state.model
+            val endpoint = (state.providerEndpoints[state.provider] ?: "").trim()
+            val model = state.providerModels[state.provider]
+                ?: PolisherSettings.DEFAULT_MODELS[state.provider]
+                ?: ""
 
             OPENAI_COMPATIBLE[state.provider]?.let { default ->
                 return OpenAiClient(key, endpoint.ifBlank { default }, model)
