@@ -44,7 +44,7 @@ class PolisherConfigurable : Configurable {
 
         if (c.apiKeyModified) {
             ApiKeyStorage.set(c.apiKey)
-            c.apiKeyModified = false
+            c.resetApiKeyModified()
         }
     }
 
@@ -60,7 +60,7 @@ class PolisherConfigurable : Configurable {
         c.autoApply = state.autoApply
         c.requestTimeout = state.requestTimeout
         c.maxSelectionLength = state.maxSelectionLength
-        c.apiKeyModified = false
+        c.resetApiKeyModified()
     }
 
     override fun disposeUIResources() {

@@ -8,6 +8,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.progress.ProgressIndicator
 import com.intellij.openapi.progress.Task
+import com.intellij.openapi.project.Project
 import dev.dalex.textpolisher.api.AiClient
 import dev.dalex.textpolisher.prompt.PromptBuilder
 import dev.dalex.textpolisher.settings.ApiKeyStorage
@@ -28,41 +29,29 @@ class EnhanceTextAction : AnAction() {
         val project = e.project ?: return
         val selectionModel = editor.selectionModel
         val selectedText = selectionModel.selectedText ?: return
+        val selectionStart = selectionModel.selectionStart
+        val selectionEnd = selectionModel.selectionEnd
 
-        val settings = PolisherSettings.getInstance()
+        val state = PolisherSettings.getInstance().state
 
-        // Validate selection length
-        if (selectedText.length > settings.state.maxSelectionLength) {
-            notify(
-                project,
-                "Selection too long (${selectedText.length} chars). Maximum is ${settings.state.maxSelectionLength}.",
-                NotificationType.WARNING
-            )
+        if (selectedText.length > state.maxSelectionLength) {
+            notify(project, "Selection too long (${selectedText.length} chars). Maximum is ${state.maxSelectionLength}.", NotificationType.WARNING)
             return
         }
 
-        // Check API key
         val apiKey = ApiKeyStorage.get()
-        if (apiKey.isNullOrBlank() && settings.state.provider != "ollama") {
-            notify(
-                project,
-                "API key not configured. Please set it in Settings > Tools > AI Text Polisher.",
-                NotificationType.ERROR
-            )
+        if (apiKey.isNullOrBlank() && state.provider != "ollama") {
+            notify(project, "API key not configured. Please set it in Settings > Tools > AI Text Polisher.", NotificationType.ERROR)
             return
         }
 
-        // Run AI call in background
         object : Task.Backgroundable(project, "AI Text Polisher: Enhancing...", true) {
             override fun run(indicator: ProgressIndicator) {
                 indicator.isIndeterminate = true
                 try {
-                    val prompt = PromptBuilder.build(selectedText, settings.state)
-                    val client = AiClient.create(settings.state, apiKey)
-                    val result = client.complete(prompt, settings.state.requestTimeout.toLong())
-
-                    // Show result on EDT
-                    DiffResultHandler.show(project, editor, selectedText, result, settings.state.autoApply)
+                    val prompt = PromptBuilder.build(selectedText, state)
+                    val result = AiClient.create(state, apiKey).complete(prompt, state.requestTimeout.toLong())
+                    DiffResultHandler.show(project, editor, selectionStart, selectionEnd, selectedText, result, state.autoApply)
                 } catch (ex: Exception) {
                     notify(project, "Enhancement failed: ${ex.message}", NotificationType.ERROR)
                 }
@@ -70,7 +59,7 @@ class EnhanceTextAction : AnAction() {
         }.queue()
     }
 
-    private fun notify(project: com.intellij.openapi.project.Project, content: String, type: NotificationType) {
+    private fun notify(project: Project, content: String, type: NotificationType) {
         NotificationGroupManager.getInstance()
             .getNotificationGroup("AI Text Polisher")
             .createNotification(content, type)

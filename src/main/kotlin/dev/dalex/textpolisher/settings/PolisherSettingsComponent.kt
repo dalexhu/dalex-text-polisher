@@ -1,11 +1,12 @@
 package dev.dalex.textpolisher.settings
 
+import com.intellij.ui.DocumentAdapter
 import com.intellij.ui.components.JBCheckBox
 import com.intellij.ui.components.JBPasswordField
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.*
-import javax.swing.JComponent
 import javax.swing.JPanel
+import javax.swing.event.DocumentEvent
 
 class PolisherSettingsComponent {
 
@@ -21,13 +22,13 @@ class PolisherSettingsComponent {
     private val requestTimeoutField = JBTextField()
     private val maxSelectionLengthField = JBTextField()
 
-    var apiKeyModified = false
+    private var _apiKeyModified = false
+    val apiKeyModified: Boolean get() = _apiKeyModified
+    fun resetApiKeyModified() { _apiKeyModified = false }
 
     init {
-        apiKeyField.document.addDocumentListener(object : javax.swing.event.DocumentListener {
-            override fun insertUpdate(e: javax.swing.event.DocumentEvent?) { apiKeyModified = true }
-            override fun removeUpdate(e: javax.swing.event.DocumentEvent?) { apiKeyModified = true }
-            override fun changedUpdate(e: javax.swing.event.DocumentEvent?) { apiKeyModified = true }
+        apiKeyField.document.addDocumentListener(object : DocumentAdapter() {
+            override fun textChanged(e: DocumentEvent) { _apiKeyModified = true }
         })
 
         val state = PolisherSettings.getInstance().state

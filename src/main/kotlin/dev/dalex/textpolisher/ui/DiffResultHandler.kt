@@ -11,28 +11,32 @@ import com.intellij.openapi.ui.Messages
 
 object DiffResultHandler {
 
-    fun show(project: Project, editor: Editor, originalText: String, polishedText: String, autoApply: Boolean) {
+    fun show(
+        project: Project,
+        editor: Editor,
+        selectionStart: Int,
+        selectionEnd: Int,
+        originalText: String,
+        polishedText: String,
+        autoApply: Boolean,
+    ) {
         ApplicationManager.getApplication().invokeLater {
             if (autoApply) {
-                replaceText(project, editor, polishedText)
+                replaceText(project, editor, selectionStart, selectionEnd, polishedText)
                 return@invokeLater
             }
 
             val factory = DiffContentFactory.getInstance()
-            val originalContent = factory.create(originalText)
-            val polishedContent = factory.create(polishedText)
-
             val request = SimpleDiffRequest(
                 "AI Text Polisher — Review Changes",
-                originalContent,
-                polishedContent,
+                factory.create(originalText),
+                factory.create(polishedText),
                 "Original",
                 "Polished"
             )
 
             DiffManager.getInstance().showDiff(project, request)
 
-            // Ask user to apply after reviewing
             val result = Messages.showYesNoDialog(
                 project,
                 "Apply the polished text?",
@@ -43,16 +47,12 @@ object DiffResultHandler {
             )
 
             if (result == Messages.YES) {
-                replaceText(project, editor, polishedText)
+                replaceText(project, editor, selectionStart, selectionEnd, polishedText)
             }
         }
     }
 
-    private fun replaceText(project: Project, editor: Editor, newText: String) {
-        val selectionModel = editor.selectionModel
-        val start = selectionModel.selectionStart
-        val end = selectionModel.selectionEnd
-
+    private fun replaceText(project: Project, editor: Editor, start: Int, end: Int, newText: String) {
         WriteCommandAction.runWriteCommandAction(project) {
             editor.document.replaceString(start, end, newText)
         }
