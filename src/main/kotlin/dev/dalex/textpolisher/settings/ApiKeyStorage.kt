@@ -7,15 +7,13 @@ import com.intellij.ide.passwordSafe.PasswordSafe
 
 object ApiKeyStorage {
 
-    private val credentialAttributes = CredentialAttributes(
-        generateServiceName("AITextPolisher", "apiKey")
+    private fun attributesFor(provider: String) = CredentialAttributes(
+        generateServiceName("AITextPolisher", provider)
     )
 
-    fun get(): String? {
-        return PasswordSafe.instance.getPassword(credentialAttributes)
-    }
+    fun get(provider: String): String? =
+        PasswordSafe.instance.getPassword(attributesFor(provider))
 
-    fun set(apiKey: String) {
-        PasswordSafe.instance.set(credentialAttributes, Credentials("apiKey", apiKey))
-    }
+    fun set(provider: String, apiKey: String) =
+        PasswordSafe.instance.set(attributesFor(provider), Credentials(provider, apiKey))
 }

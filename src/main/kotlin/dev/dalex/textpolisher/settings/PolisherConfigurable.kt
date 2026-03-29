@@ -43,7 +43,7 @@ class PolisherConfigurable : Configurable {
         settings.state.maxSelectionLength = c.maxSelectionLength
 
         if (c.apiKeyModified) {
-            ApiKeyStorage.set(c.apiKey)
+            ApiKeyStorage.set(c.provider, c.apiKey)
             c.resetApiKeyModified()
         }
     }

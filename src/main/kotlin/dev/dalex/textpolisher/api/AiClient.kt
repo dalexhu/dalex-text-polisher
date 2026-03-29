@@ -3,6 +3,9 @@ package dev.dalex.textpolisher.api
 import dev.dalex.textpolisher.prompt.PromptBuilder
 import dev.dalex.textpolisher.settings.PolisherSettings
 
+/**
+ * Interface for AI clients that provide completion functionality.
+ */
 interface AiClient {
     fun complete(prompt: PromptBuilder.Prompt, timeoutMs: Long): String
 

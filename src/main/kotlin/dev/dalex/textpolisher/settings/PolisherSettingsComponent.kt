@@ -31,8 +31,20 @@ class PolisherSettingsComponent {
             override fun textChanged(e: DocumentEvent) { _apiKeyModified = true }
         })
 
+        // When provider changes, load the stored key for that provider
+        providerCombo.addActionListener {
+            val selectedProvider = providerCombo.selectedItem as? String ?: return@addActionListener
+            val storedKey = ApiKeyStorage.get(selectedProvider) ?: ""
+            // Suppress _apiKeyModified — loading a stored key is not a user edit
+            _apiKeyModified = false
+            apiKeyField.text = storedKey
+            _apiKeyModified = false
+        }
+
         val state = PolisherSettings.getInstance().state
         providerCombo.selectedItem = state.provider
+        apiKeyField.text = ApiKeyStorage.get(state.provider) ?: ""
+        _apiKeyModified = false
         apiEndpointField.text = state.apiEndpoint
         modelField.text = state.model
         languageCombo.selectedItem = state.targetLanguage

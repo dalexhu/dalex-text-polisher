@@ -39,7 +39,7 @@ class EnhanceTextAction : AnAction() {
             return
         }
 
-        val apiKey = ApiKeyStorage.get()
+        val apiKey = ApiKeyStorage.get(state.provider)
         if (apiKey.isNullOrBlank() && state.provider != "ollama") {
             notify(project, "API key not configured. Please set it in Settings > Tools > AI Text Polisher.", NotificationType.ERROR)
             return
