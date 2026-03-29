@@ -8,25 +8,43 @@ interface AiClient {
 
     companion object {
         fun create(state: PolisherSettings.State, apiKey: String?): AiClient {
+            val key = apiKey ?: ""
+            val endpoint = state.apiEndpoint.trim()
+            val model = state.model
             return when (state.provider) {
                 "anthropic" -> AnthropicClient(
-                    apiKey = apiKey ?: "",
-                    endpoint = state.apiEndpoint.ifBlank { "https://api.anthropic.com" },
-                    model = state.model,
+                    apiKey = key,
+                    endpoint = endpoint.ifBlank { "https://api.anthropic.com" },
+                    model = model,
                 )
                 "openai" -> OpenAiClient(
-                    apiKey = apiKey ?: "",
-                    endpoint = state.apiEndpoint.ifBlank { "https://api.openai.com" },
-                    model = state.model,
+                    apiKey = key,
+                    endpoint = endpoint.ifBlank { "https://api.openai.com" },
+                    model = model,
                 )
                 "deepseek" -> OpenAiClient(
-                    apiKey = apiKey ?: "",
-                    endpoint = state.apiEndpoint.ifBlank { "https://api.deepseek.com" },
-                    model = state.model,
+                    apiKey = key,
+                    endpoint = endpoint.ifBlank { "https://api.deepseek.com" },
+                    model = model,
+                )
+                "groq" -> OpenAiClient(
+                    apiKey = key,
+                    endpoint = endpoint.ifBlank { "https://api.groq.com/openai" },
+                    model = model,
+                )
+                "mistral" -> OpenAiClient(
+                    apiKey = key,
+                    endpoint = endpoint.ifBlank { "https://api.mistral.ai" },
+                    model = model,
+                )
+                "gemini" -> OpenAiClient(
+                    apiKey = key,
+                    endpoint = endpoint.ifBlank { "https://generativelanguage.googleapis.com/v1beta/openai" },
+                    model = model,
                 )
                 "ollama" -> OllamaClient(
-                    endpoint = state.apiEndpoint.ifBlank { "http://localhost:11434" },
-                    model = state.model,
+                    endpoint = endpoint.ifBlank { "http://localhost:11434" },
+                    model = model,
                 )
                 else -> throw IllegalArgumentException("Unknown provider: ${state.provider}")
             }

@@ -39,7 +39,7 @@ class PolisherSettings : PersistentStateComponent<PolisherSettings.State> {
         fun getInstance(): PolisherSettings =
             ApplicationManager.getApplication().getService(PolisherSettings::class.java)
 
-        val PROVIDERS = listOf("anthropic", "openai", "deepseek", "ollama")
+        val PROVIDERS = listOf("anthropic", "openai", "deepseek", "groq", "mistral", "gemini", "ollama")
         val MODES = listOf("correct-only", "rephrase", "formal", "concise")
         val LANGUAGES = listOf(
             "English", "Chinese", "French", "German", "Spanish",
