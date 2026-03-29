@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "dev.dalex"
-version = "0.1.3"
+version = "0.1.0"
 
 repositories {
     mavenCentral()
