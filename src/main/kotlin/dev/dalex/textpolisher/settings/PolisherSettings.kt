@@ -24,6 +24,7 @@ class PolisherSettings : PersistentStateComponent<PolisherSettings.State> {
         var customPrompt: String = "",
 
         // Behavior
+        var resultDisplay: String = "inline",
         var autoApply: Boolean = false,
         var requestTimeout: Int = 15000,
         var maxSelectionLength: Int = 2000,
@@ -41,6 +42,7 @@ class PolisherSettings : PersistentStateComponent<PolisherSettings.State> {
 
         val PROVIDERS = listOf("anthropic", "openai", "deepseek", "groq", "mistral", "gemini", "ollama")
         val MODES = listOf("correct-only", "rephrase", "formal", "concise")
+        val RESULT_DISPLAYS = listOf("inline", "diff")
         val LANGUAGES = listOf(
             "English", "Chinese", "French", "German", "Spanish",
             "Japanese", "Korean", "Portuguese", "Russian", "Italian"

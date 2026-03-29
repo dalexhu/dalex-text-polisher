@@ -18,6 +18,7 @@ class PolisherSettingsComponent {
     private val languageCombo = com.intellij.openapi.ui.ComboBox(PolisherSettings.LANGUAGES.toTypedArray())
     private val modeCombo = com.intellij.openapi.ui.ComboBox(PolisherSettings.MODES.toTypedArray())
     private val customPromptField = JBTextField()
+    private val resultDisplayCombo = com.intellij.openapi.ui.ComboBox(PolisherSettings.RESULT_DISPLAYS.toTypedArray())
     private val autoApplyBox = JBCheckBox()
     private val requestTimeoutField = JBTextField()
     private val maxSelectionLengthField = JBTextField()
@@ -50,6 +51,7 @@ class PolisherSettingsComponent {
         languageCombo.selectedItem = state.targetLanguage
         modeCombo.selectedItem = state.mode
         customPromptField.text = state.customPrompt
+        resultDisplayCombo.selectedItem = state.resultDisplay
         autoApplyBox.isSelected = state.autoApply
         requestTimeoutField.text = state.requestTimeout.toString()
         maxSelectionLengthField.text = state.maxSelectionLength.toString()
@@ -73,7 +75,8 @@ class PolisherSettingsComponent {
                 }
             }
             group("Behavior") {
-                row { cell(autoApplyBox).label("Auto-apply:").comment("Skip diff preview and replace directly") }
+                row("Result Display:") { cell(resultDisplayCombo).columns(COLUMNS_SHORT) }
+                row { cell(autoApplyBox).label("Auto-apply:").comment("Skip preview and replace directly") }
                 row("Request Timeout (ms):") { cell(requestTimeoutField).columns(COLUMNS_SHORT) }
                 row("Max Selection Length:") { cell(maxSelectionLengthField).columns(COLUMNS_SHORT) }
             }
@@ -107,6 +110,10 @@ class PolisherSettingsComponent {
     var customPrompt: String
         get() = customPromptField.text
         set(value) { customPromptField.text = value }
+
+    var resultDisplay: String
+        get() = resultDisplayCombo.selectedItem as String
+        set(value) { resultDisplayCombo.selectedItem = value }
 
     var autoApply: Boolean
         get() = autoApplyBox.isSelected

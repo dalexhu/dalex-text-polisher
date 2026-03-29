@@ -23,6 +23,7 @@ class PolisherConfigurable : Configurable {
                 || c.targetLanguage != state.targetLanguage
                 || c.mode != state.mode
                 || c.customPrompt != state.customPrompt
+                || c.resultDisplay != state.resultDisplay
                 || c.autoApply != state.autoApply
                 || c.requestTimeout != state.requestTimeout
                 || c.maxSelectionLength != state.maxSelectionLength
@@ -38,6 +39,7 @@ class PolisherConfigurable : Configurable {
         settings.state.targetLanguage = c.targetLanguage
         settings.state.mode = c.mode
         settings.state.customPrompt = c.customPrompt
+        settings.state.resultDisplay = c.resultDisplay
         settings.state.autoApply = c.autoApply
         settings.state.requestTimeout = c.requestTimeout
         settings.state.maxSelectionLength = c.maxSelectionLength
@@ -57,6 +59,7 @@ class PolisherConfigurable : Configurable {
         c.targetLanguage = state.targetLanguage
         c.mode = state.mode
         c.customPrompt = state.customPrompt
+        c.resultDisplay = state.resultDisplay
         c.autoApply = state.autoApply
         c.requestTimeout = state.requestTimeout
         c.maxSelectionLength = state.maxSelectionLength

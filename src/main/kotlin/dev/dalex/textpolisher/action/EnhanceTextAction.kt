@@ -51,7 +51,7 @@ class EnhanceTextAction : AnAction() {
                 try {
                     val prompt = PromptBuilder.build(selectedText, state)
                     val result = AiClient.create(state, apiKey).complete(prompt, state.requestTimeout.toLong())
-                    DiffResultHandler.show(project, editor, selectionStart, selectionEnd, selectedText, result, state.autoApply)
+                    DiffResultHandler.show(project, editor, selectionStart, selectionEnd, selectedText, result, state.autoApply, state.resultDisplay)
                 } catch (ex: Exception) {
                     notify(project, "Enhancement failed: ${ex.message}", NotificationType.ERROR)
                 }
