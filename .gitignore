@@ -17,3 +17,6 @@ Thumbs.db
 
 # Claude
 .claude/
+
+# Local docs
+IntelliJ插件开发指南.md
