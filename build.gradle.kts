@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "dev.dalex"
-version = "0.1.0"
+version = "0.1.2"
 
 repositories {
     mavenCentral()
@@ -28,11 +28,14 @@ dependencies {
 }
 
 intellijPlatform {
+    publishing {
+        token = providers.environmentVariable("PUBLISH_TOKEN")
+    }
+
     pluginConfiguration {
         id = "dev.dalex.textpolisher"
         name = "AI Text Polisher"
         version = project.version.toString()
-        description = "AI-powered text polishing tool. Select text, right-click, and enhance with Anthropic, OpenAI, or Ollama."
         vendor {
             name = "dalex"
             url = "https://dalex.dev"
@@ -40,9 +43,6 @@ intellijPlatform {
         ideaVersion {
             sinceBuild = "243"
         }
-        changeNotes = """
-            Initial release.
-        """.trimIndent()
     }
 }
 

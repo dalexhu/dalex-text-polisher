@@ -4,7 +4,7 @@ import dev.dalex.textpolisher.prompt.PromptBuilder
 import dev.dalex.textpolisher.settings.PolisherSettings
 
 /**
- * Interface for AI clients that can generate text completions. Please confirm whether the functional design is reasonable.
+ * Interface for AI clients that can generate text completions.
  */
 interface AiClient {
     fun complete(prompt: PromptBuilder.Prompt, timeoutMs: Long): String
@@ -12,11 +12,11 @@ interface AiClient {
     companion object {
         // OpenAI-compatible providers: id → default endpoint
         private val OPENAI_COMPATIBLE = mapOf(
-            "openai"   to "https://api.openai.com",
+            "openai" to "https://api.openai.com",
             "deepseek" to "https://api.deepseek.com",
-            "groq"     to "https://api.groq.com/openai",
-            "mistral"  to "https://api.mistral.ai",
-            "gemini"   to "https://generativelanguage.googleapis.com/v1beta/openai",
+            "groq" to "https://api.groq.com/openai",
+            "mistral" to "https://api.mistral.ai",
+            "gemini" to "https://generativelanguage.googleapis.com/v1beta/openai",
         )
 
         fun create(state: PolisherSettings.State, apiKey: String?): AiClient {
@@ -32,8 +32,8 @@ interface AiClient {
 
             return when (state.provider) {
                 "anthropic" -> AnthropicClient(key, endpoint.ifBlank { "https://api.anthropic.com" }, model)
-                "ollama"    -> OllamaClient(endpoint.ifBlank { "http://localhost:11434" }, model)
-                else        -> throw IllegalArgumentException("Unknown provider: ${state.provider}")
+                "ollama" -> OllamaClient(endpoint.ifBlank { "http://localhost:11434" }, model)
+                else -> throw IllegalArgumentException("Unknown provider: ${state.provider}")
             }
         }
     }

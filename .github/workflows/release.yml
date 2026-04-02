@@ -33,6 +33,11 @@ jobs:
           ZIP_PATH=$(ls build/distributions/*.zip)
           echo "path=$ZIP_PATH" >> $GITHUB_OUTPUT
 
+      - name: Publish to JetBrains Marketplace
+        run: ./gradlew publishPlugin
+        env:
+          PUBLISH_TOKEN: ${{ secrets.PUBLISH_TOKEN }}
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:

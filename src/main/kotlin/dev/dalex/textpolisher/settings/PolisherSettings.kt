@@ -53,11 +53,23 @@ class PolisherSettings : PersistentStateComponent<PolisherSettings.State> {
             "gemini"    to "gemini-2.0-flash",
             "ollama"    to "llama3.2",
         )
+        const val FOLLOW_SYSTEM = "Follow System"
+
+        val LOCALE_TO_LANGUAGE = mapOf(
+            "en" to "English",
+            "zh" to "Chinese",
+            "fr" to "French",
+            "de" to "German",
+            "es" to "Spanish",
+            "ja" to "Japanese",
+            "ko" to "Korean",
+            "pt" to "Portuguese",
+            "ru" to "Russian",
+            "it" to "Italian",
+        )
+
         val MODES = listOf("correct-only", "rephrase", "formal", "concise")
         val RESULT_DISPLAYS = listOf("inline", "diff")
-        val LANGUAGES = listOf(
-            "English", "Chinese", "French", "German", "Spanish",
-            "Japanese", "Korean", "Portuguese", "Russian", "Italian"
-        )
+        val LANGUAGES = listOf(FOLLOW_SYSTEM) + LOCALE_TO_LANGUAGE.values
     }
 }

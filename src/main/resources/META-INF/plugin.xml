@@ -120,6 +120,19 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        <h3>0.1.2</h3>
+        <ul>
+            <li>Fixed plugin description and change notes not showing on Marketplace</li>
+            <li>Consolidated duplicate language data into a single source of truth</li>
+            <li>Extracted "Follow System" sentinel to a shared constant</li>
+        </ul>
+        <h3>0.1.1</h3>
+        <ul>
+            <li>Output language setting: choose from 10 languages or select "Follow System" to auto-detect from OS locale</li>
+            <li>Improved polish quality: comment markers, proper nouns, and technical acronyms are now preserved and correctly capitalized</li>
+            <li>Streamlined enhancement modes: correct-only, rephrase, formal, concise</li>
+            <li>Optimized prompt structure — only the active mode instruction is sent, reducing token usage</li>
+        </ul>
         <h3>0.1.0</h3>
         <ul>
             <li>Added DeepSeek, Groq, Mistral, and Gemini provider support (7 providers total)</li>
@@ -143,6 +156,8 @@
                 description="Polish the selected text using AI">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
             <keyboard-shortcut keymap="$default" first-keystroke="meta shift D"/>
+            <keyboard-shortcut keymap="Mac OS X" first-keystroke="meta shift D"/>
+            <keyboard-shortcut keymap="Mac OS X 10.5+" first-keystroke="meta shift D"/>
         </action>
     </actions>
 
