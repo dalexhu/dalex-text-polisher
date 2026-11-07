@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "dev.dalex"
-version = "0.1.2"
+version = "0.1.3"
 
 repositories {
     mavenCentral()
@@ -42,6 +42,21 @@ intellijPlatform {
         }
         ideaVersion {
             sinceBuild = "243"
+            // Keep compatibility open-ended explicitly across Gradle plugin upgrades.
+            untilBuild = provider { null }
+        }
+    }
+
+    pluginVerification {
+        ides {
+            ide("IC", "2024.3.5")
+            // Use an installed IDE for local checks; CI downloads the target release.
+            val verificationIdePath = providers.gradleProperty("verificationIdePath")
+            if (verificationIdePath.isPresent) {
+                local(file(verificationIdePath.get()))
+            } else {
+                ide("IU", "2026.3")
+            }
         }
     }
 }

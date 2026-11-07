@@ -11,8 +11,8 @@ class PromptBuilderTest {
         val state = PolisherSettings.State(mode = "correct-only", targetLanguage = "English")
         val prompt = PromptBuilder.build("Ths is a tset", state)
 
-        assertTrue(prompt.systemMessage.contains("Fix only spelling and grammar"))
-        assertTrue(prompt.systemMessage.contains("Do not change the style"))
+        assertTrue(prompt.systemMessage.contains("including spelling, grammar"))
+        assertTrue(prompt.systemMessage.contains("Preserve the original sentence structure"))
         assertTrue(prompt.systemMessage.contains("English"))
         assertEquals("Ths is a tset", prompt.userMessage)
     }
@@ -22,7 +22,7 @@ class PromptBuilderTest {
         val state = PolisherSettings.State(mode = "rephrase", targetLanguage = "French")
         val prompt = PromptBuilder.build("Hello world", state)
 
-        assertTrue(prompt.systemMessage.contains("Rephrase"))
+        assertTrue(prompt.systemMessage.contains("natural and fluent"))
         assertTrue(prompt.systemMessage.contains("French"))
     }
 
@@ -67,6 +67,6 @@ class PromptBuilderTest {
         val state = PolisherSettings.State()
         val prompt = PromptBuilder.build("test", state)
 
-        assertTrue(prompt.systemMessage.contains("Return ONLY the polished text"))
+        assertTrue(prompt.systemMessage.contains("Output only the final result"))
     }
 }

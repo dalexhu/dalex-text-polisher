@@ -25,7 +25,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build plugin
-        run: ./gradlew buildPlugin
+        run: ./gradlew test buildPlugin verifyPlugin
 
       - name: Get plugin zip path
         id: zip

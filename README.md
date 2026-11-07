@@ -27,6 +27,9 @@ Works anywhere you write: commit messages, docstrings, README files, inline comm
 
 ## Installation
 
+Requires IntelliJ Platform 2024.3 or later (build 243+). Version 0.1.3 is
+binary-verified against IntelliJ IDEA 2024.3.5 and 2026.3.
+
 **From JetBrains Marketplace:**
 
 1. Open **Settings → Plugins → Marketplace**
@@ -69,6 +72,9 @@ To customize: **Settings → Keymap** → search *AI Text Polisher* → assign a
 
 ## Building from Source
 
+Use JDK 21. The plugin is compiled against 2024.3 to retain compatibility with
+the oldest supported IDE.
+
 ```bash
 git clone https://github.com/dalexhu/dalex-text-polisher.git
 cd dalex-text-polisher
@@ -76,6 +82,18 @@ cd dalex-text-polisher
 ```
 
 The plugin zip is generated at `build/distributions/`.
+
+Run tests and binary compatibility checks against 2024.3 and IntelliJ IDEA 2026.3 before publishing:
+
+```bash
+./gradlew test verifyPlugin
+```
+
+To verify against an installed IDE instead of downloading 2026.3:
+
+```bash
+./gradlew verifyPlugin -PverificationIdePath="/path/to/IntelliJ IDEA.app"
+```
 
 To run a sandboxed IDE instance for testing:
 
